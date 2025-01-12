@@ -1,0 +1,13 @@
+{
+  "name": "02_url_shortner",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev":"node --watch app.js",
+    "start": "node app.js"
+  }
+}

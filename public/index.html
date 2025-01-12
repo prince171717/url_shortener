@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>URL Shortner</title>
+  </head>
+  <body>
+    <div class="flex h-screen w-full justify-center items-center bg-gray-500">
+      <div class="flex justify-center items-center w-full">
+        <div
+          class="flex justify-center flex-col w-[400px] px-5 py-3 rounded-lg gap-4 bg-white"
+        >
+          <div class="text-center">
+            <h1 class="text-4xl font-bold">Url Shortner</h1>
+          </div>
+          <form id="shorten-form" class="flex flex-col gap-2">
+            <div class="flex flex-col">
+              <label for="url">Enter Url:</label>
+              <input
+                type="url"
+                name="url"
+                id="url"
+                required
+                class="border border-black rounded-lg px-3 py-1"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label for="shortcode">Enter shortcode:</label>
+              <input
+                type="text"
+                name="shortcode"
+                id="shortcode"
+                required
+                class="border border-black rounded-lg px-3 py-1"
+              />
+            </div>
+            <div class="text-center">
+              <button
+                type="submit"
+                class="bg-blue-500 p-3 w-fit text-white rounded-lg"
+              >
+                Shorten
+              </button>
+            </div>
+          </form>
+
+          <h2 class="flex justify-center text-2xl font-medium">
+            shortend URLs
+          </h2>
+          <ul id="shortend-urls"></ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const fetchshorturl = async () => {
+        const res = await fetch('/links')
+        const links = await res.json()
+        console.log("links",links);
+        
+        const list = document.getElementById("shortend-urls")
+        list.innerHTML ="";
+
+      for (const [shortcode,url] of Object.entries(links)) {
+        const li = document.createElement('li')
+        li.innerHTML=`<a href="/${shortcode}" target="_blank">${window.location.origin}/${shortcode}</a> - ${url}`
+        list.appendChild(li)
+      }
+      };
+
+      document
+        .getElementById("shorten-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const url = formData.get("url");
+          const shortcode = formData.get("shortcode");
+          console.log(url, shortcode);
+
+          try {
+            const response = await fetch("/shorten", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url, shortcode }),
+            });
+
+            if (response.ok) {
+              fetchshorturl();
+              alert("form submitted successfully");
+              event.target.reset();
+            } else {
+              const errormessage = await response.text();
+              alert(errormessage);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+      fetchshorturl();
+    </script>
+  </body>
+</html>
